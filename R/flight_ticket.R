@@ -36,7 +36,7 @@ flight_ticket <- function(Apikey, origin, destination, roundtrip, dateorigin, da
   require(xlsx)
   require(geosphere)
   require(ggmap)
-  airport <- read.csv("Airports.csv", sep=";", stringsAsFactors = F)
+  airport <- data(Airports)
   airport$Airport.Origin.Code <- as.character(airport$Airport.Origin.Code)
   colnames(airport) <- c('City', 'Code', 'Aiport', 'Area', 'Type')
   airp_mat <- read.csv('Airpmat_1.csv')
