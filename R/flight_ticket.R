@@ -39,7 +39,7 @@ flight_ticket <- function(Apikey, origin, destination, roundtrip, dateorigin, da
   airport <- data(Airports)
   airport$Airport.Origin.Code <- as.character(airport$Airport.Origin.Code)
   colnames(airport) <- c('City', 'Code', 'Aiport', 'Area', 'Type')
-  airp_mat <- read.csv('Airpmat_1.csv')
+  airp_mat <- data(Airpmat_1)
   airp_mat <- airp_mat[,-1]
   url <- paste('https://www.googleapis.com/qpxExpress/v1/trips/search?key=', Apikey,  '&alt=json', sep ='')
   n_orig <- length(origin)
