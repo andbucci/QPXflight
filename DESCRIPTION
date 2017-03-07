@@ -3,7 +3,9 @@ Title: The package allows you to download the flight data
 Version: 0.0.0.9000
 Authors@R: person("Andrea", "Bucci", email = "a.bucci@univpm.it", role = c("aut", "cre"))
 Description: The package gathers flight data from QPX API.
-Depends: R (>= 3.3.2)
+Depends:
+    R (>= 3.3.2)
 License: None
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 5.0.1

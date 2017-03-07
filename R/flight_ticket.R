@@ -426,8 +426,13 @@ else {
     db$city1[db$Origin_A == airport$Code[h]] <- airport$City[h]
     db$city2[db$Destination_A == airport$Code[h]] <- airport$City[h]
   }
-  
+  if (class != "Economy"){
   db$Economy <- class
+  }
+  else{
+    db$Economy[db$id %in% onlycoach,] <- "Economy"
+    db$Economy[!db$id %in% onlycoach,] <- "Business"
+  }
   
 
   db$route <- paste(db$Origin_A, db$Origin_B, sep = '-')
