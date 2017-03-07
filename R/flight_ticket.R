@@ -426,7 +426,7 @@ else {
     db$city1[db$Origin_A == airport$Code[h]] <- airport$City[h]
     db$city2[db$Destination_A == airport$Code[h]] <- airport$City[h]
   }
-  if (class != "Economy"){
+  if (class != "Both"){
   db$Economy <- class
   }
   else{
