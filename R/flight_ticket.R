@@ -66,7 +66,7 @@ flight_ticket <- function(Apikey, origin, destination, roundtrip, dateorigin, da
           refundable = F))) # default: F - refundable AND non-refundable are listed
 }
 }
-else {
+ else {
   if (is.null(datedeparture)){
     warning("Insert a date")}
   else{
@@ -171,6 +171,8 @@ else {
   
   #We use lists of objects to apply the loop on all the connections considered
   data_items <- list()
+  Business <- list()
+  businessID <- list()
   flight_data <- list()
   tripClass <- list()
   dimen <- list()
@@ -224,13 +226,17 @@ else {
       #This has to be changed for Extra-EU flights.
       dimen[[i]] <- dim(tripClass[[i]])
       if (dimen[[i]][2] == 3){
-        onlyCoach[[i]] <- tripClass[[i]][tripClass[[i]][,1] == 0 & tripClass[[i]][,3] == 0,] #For extra-EUtripClass[[i]][tripClass[[i]][,2] == 0 & tripClass[[i]][,3] == 0,]
+        onlyCoach[[i]] <- tripClass[[i]][tripClass[[i]][,1] == 0 & tripClass[[i]][,3] == 0,]
+        Business[[i]] <- tripClass[[i]][tripClass[[i]][,2] == 0 & tripClass[[i]][,3] == 0,] #For extra-EUtripClass[[i]][tripClass[[i]][,2] == 0 & tripClass[[i]][,3] == 0,]
       } else if (dimen[[i]][2] == 2){
-        onlyCoach[[i]] <- tripClass[[i]][tripClass[[i]][,1] == 0,] #For Extra-EU tripClass[[i]][tripClass[[i]][,2] == 0,] 
+        onlyCoach[[i]] <- tripClass[[i]][tripClass[[i]][,1] == 0,] 
+        Business[[i]] <- tripClass[[i]][tripClass[[i]][,2] == 0,]#For Extra-EU tripClass[[i]][tripClass[[i]][,2] == 0,] 
       } else {
         onlyCoach[[i]] <- tripClass[[i]]
+        Business[[i]] <- tripClass[[i]]
       } #Consider only the cases where every segment belongs to COACH class
       onlyCoachID[[i]] <- sort(rownames(onlyCoach[[i]]))
+      businessID[[i]] <- sort(rownames(Business[[i]]))
       dataframe[[i]] <- data.frame(unique(flight_data[[i]]$id), stringsAsFactors = F)#Merge for the single id
       colnames(dataframe[[i]]) <- c('id')
       #dataframe[[i]] <- flight_data[[i]][flight_data[[i]]$id %in% onlyCoachID[[i]],]
@@ -333,29 +339,29 @@ else {
       dataframe[[i]] <- join(dataframe[[i]], pd1[[i]], by='id', type='left', match='first')
       
       
-      #date-economy
+      #date
       if (length(duSingle[[i]][,1]) != 0){
         date[[i]] <- as.character(rep(x[[i]]$request$slice[[1]][3], length(dataframe[[i]][,1])))
       }
       else {
         date[[i]] <- as.character(rep(x[[i]]$request$slice[[1]][3], 1))
       }
+      #if (length(duSingle[[i]][,1]) != 0){
+      #  economy[[i]] <- matrix(nrow = length(dataframe[[i]][,1]))
+      #  economy[[i]][!grepl("BEG|TIA|ZRH|OSL|KEF|IST|SVO|LED|ATL|LAX|JFK|DEN|DEW|SFO|YYZ|YVR|MEX|GRU|SCL|LIM|AEP|BOG|SYD|MEL|PER|AKL|TLV|DXB|DEL|BOM|BLR|CCU|PEK|PVG|CAN|CTU|HKG|
+      #                      SIN|ICN|HND|FUK|CGK|JNB|HRG|CMN|LOS|ALG|NBO|TUN|ADD", x[[i]]$request$slice[[1]][1])] <- 1 #Define as economy a flight intra-EU and as Business a flight-ExtraEU
+      #  economy[[i]][grepl("BEG|TIA|ZRH|OSL|KEF|IST|SVO|LED|ATL|LAX|JFK|DEN|DEW|SFO|YYZ|YVR|MEX|GRU|SCL|LIM|AEP|BOG|SYD|MEL|PER|AKL|TLV|DXB|DEL|BOM|BLR|CCU|PEK|PVG|CAN|CTU|HKG|
+      #                     SIN|ICN|HND|FUK|CGK|JNB|HRG|CMN|LOS|ALG|NBO|TUN|ADD", x[[i]]$request$slice[[1]][1])] <- 0
+      #}
+      #else {
+      #  economy[[i]] <- data.frame(x=0)
+      #}
       if (length(duSingle[[i]][,1]) != 0){
-        economy[[i]] <- matrix(nrow = length(dataframe[[i]][,1]))
-        economy[[i]][!grepl("BEG|TIA|ZRH|OSL|KEF|IST|SVO|LED|ATL|LAX|JFK|DEN|DEW|SFO|YYZ|YVR|MEX|GRU|SCL|LIM|AEP|BOG|SYD|MEL|PER|AKL|TLV|DXB|DEL|BOM|BLR|CCU|PEK|PVG|CAN|CTU|HKG|
-                            SIN|ICN|HND|FUK|CGK|JNB|HRG|CMN|LOS|ALG|NBO|TUN|ADD", x[[i]]$request$slice[[1]][1])] <- 1 #Define as economy a flight intra-EU and as Business a flight-ExtraEU
-        economy[[i]][grepl("BEG|TIA|ZRH|OSL|KEF|IST|SVO|LED|ATL|LAX|JFK|DEN|DEW|SFO|YYZ|YVR|MEX|GRU|SCL|LIM|AEP|BOG|SYD|MEL|PER|AKL|TLV|DXB|DEL|BOM|BLR|CCU|PEK|PVG|CAN|CTU|HKG|
-                           SIN|ICN|HND|FUK|CGK|JNB|HRG|CMN|LOS|ALG|NBO|TUN|ADD", x[[i]]$request$slice[[1]][1])] <- 0
-      }
-      else {
-        economy[[i]] <- data.frame(x=0)
-      }
-      if (length(duSingle[[i]][,1]) != 0){
-        dataframe[[i]] <- cbind(dataframe[[i]], economy[[i]], date[[i]])
+        dataframe[[i]] <- cbind(dataframe[[i]], date[[i]])
       }
       else {
         dataframe[[i]] <- data.frame(id = "NA", slide.duration = 0, segment.leg.mileage = 0, Segment_number = 0,
-                                     direct = 0, pr.refund = "NA", price1 = 0, economy = 0, 
+                                     direct = 0, pr.refund = "NA", price1 = 0, 
                                      date = as.character(rep(x[[i]]$request$slice[[1]][3], 1)))
       }
       
@@ -380,45 +386,45 @@ else {
       carrier[[i]] <- as.data.frame(carrier[[i]])
       dataframe[[i]] <- join(dataframe[[i]], carrier[[i]], by='id', type='left', match='first')
       
-      colnames(dataframe[[i]]) <- c("id", "Duration", "Distance", "Number of Segment", "Direct", "Refundable", "Price", "Economy",
+      colnames(dataframe[[i]]) <- c("id", "Duration", "Distance", "Number of Segment", "Direct", "Refundable", "Price",
                                     "Date", "Origin_A", "Destination_A", "Origin_B", "Destination_B", names_1)
       }
     else {
       
       dataframe[[i]] <- data.frame(id = "NA", Duration = 0, Distance = 0, Number_of_segment = 0,
-                                   direct = 0, pr.refund = "NA", price1 = 0, economy = 0, 
+                                   direct = 0, pr.refund = "NA", price1 = 0, 
                                    Date = as.character(rep(x[[i]]$request$slice[[1]][3], 1)), Origin_A = airp_mat[i,1], Destination_A = airp_mat[i,2], 
                                    Origin_R = airp_mat[i,2], Destination_R = airp_mat[i,1], Carrier_1 = "NA",Carrier_2 = "NA",Carrier_3 = "NA",
                                    Carrier_4 = "NA", Carrier_5 = "NA", Carrier_6 = "NA", Carrier_7 = "NA", Carrier_8 = "NA",
                                    Carrier_9 = "NA", Carrier_10 = "NA")
-      colnames(dataframe[[i]]) <- c("id", "Duration", "Distance", "Number of Segment", "Direct", "Refundable", "Price", "Economy",
+      colnames(dataframe[[i]]) <- c("id", "Duration", "Distance", "Number of Segment", "Direct", "Refundable", "Price",
                                     "Date", "Origin_A", "Destination_A", "Origin_B", "Destination_B", names_1)
     }
   }
   
  
   
-  onlycoach <- do.call("rbind", unique(onlyCoachID))
-  onlycoach <- c(onlycoach)
-
+onlycoach <- do.call("rbind", unique(onlyCoachID))
+onlycoach <- c(onlycoach)
+business <- do.call("rbind", unique(businessID))
+business <- c(business)
   
   #Unlist the dataframe list to a db
 
   db <- do.call("rbind", dataframe)
   if (flexible == TRUE){
     db <- db[db$Refundable == TRUE,]
+  } else{
+    db <- db
   }
   
   if (class == "Economy"){
     db <- db[db$id %in% onlycoach,]
-  }
-  else if(class == "Business"){
+  } else if (class == "Business"){
     db <- db[!db$id %in% onlycoach,]
-  }
-  else if(class == "Both"){
+  } else if (class == "Both"){
     db <- db
-  }
-  else{
+  } else{
     warning("Insert a valid class")
   }
   
@@ -426,14 +432,11 @@ else {
     db$city1[db$Origin_A == airport$Code[h]] <- airport$City[h]
     db$city2[db$Destination_A == airport$Code[h]] <- airport$City[h]
   }
-  if (class != "Both"){
-  db$Economy <- class
-  }
-  else{
-    db$Economy[db$id %in% onlycoach,] <- "Economy"
-    db$Economy[!db$id %in% onlycoach,] <- "Business"
-  }
-  
+
+db$Economy[db$id %in% onlycoach] <- "Economy"
+db$Economy[!db$id %in% onlycoach] <- "Business"
+
+
 
   db$route <- paste(db$Origin_A, db$Origin_B, sep = '-')
 
