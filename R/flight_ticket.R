@@ -1,28 +1,3 @@
-#' Flight ticket
-#'
-#' This function allows you to gather the data from the QPX API.
-#' @param Apikey You should insert here your Google API key
-#' @param origin Single IATA Code of the airport of departure or vector of Codes
-#' @param destination Single IATA Code of the airport of arrival or vector of Codes. The number of Codes for destination must match with the number of Codes for origin.
-#' @param roundtrip 1 or 0, 1 value implies a roundtrip flight
-#' @param dateorigin Date of departure (e.g. '2017-01-01')
-#' @param datedeparture Date of return, set to NULL by default
-#' @param flexible Optional - If FALSE both refundable and non-refundable flights are taken into account, if TRUE only refundable flights are considered (set to FALSE by default)
-#' @param class Optional - If 'Economy' only economy flights are considered, if 'Business' only Business flights are considered, 'Both' includes all the data (set to 'Economy')
-#' @param earliest1 Optional - Earliest hour of departure for the first date (set to '06:00')
-#' @param latest1 Optional - Latest hour of departure for the first date (set to '15:00')
-#' @param earliest2 Optional - Earliest hour of departure for the return (set to '12:00')
-#' @param latest2 Optional - Latest hour of departure for the return (set to '18:00')
-#' @param connec1 Optional - Maximum waiting for non-direct flight (set to 90 minutes)
-#' @param connec2 Optional - Maximum waiting for non-direct flight (set to 90 minutes)
-#' @param maxprice Optional - Price ceiling for the flight
-#' @examples
-#' flight_ticket(Apikey, origin = "FCO", destination = "LHR", roundtrip = 1, dateorigin = '2017-03-25', datedeparture = '2017-03-28', maxprice = 'EUR5000')
-#' @author Andrea Bucci, a.bucci@univpm.it
-#' @export flight_ticket()
-
-
-
 flight_ticket <- function(Apikey, origin, destination, roundtrip, dateorigin, datedeparture = NULL, flexible = FALSE, class = "Economy", earliest1 = "6:00", latest1 = "15:00", earliest2 = "12:00", latest2 = "18:00", connec1 = 90, connec2 = 90, maxprice = "EUR2000"){
   require(RCurl)      # https://cran.r-project.org/web/packages/curl/vignettes/intro.html
   require(jsonlite)
@@ -36,8 +11,6 @@ flight_ticket <- function(Apikey, origin, destination, roundtrip, dateorigin, da
   require(xlsx)
   require(geosphere)
   require(ggmap)
-  data(Airports)
-  data(Airpmat_1)
   url <- paste('https://www.googleapis.com/qpxExpress/v1/trips/search?key=', Apikey,  '&alt=json', sep ='')
   n_orig <- length(origin)
   n_dest <- length(destination)
@@ -64,39 +37,35 @@ flight_ticket <- function(Apikey, origin, destination, roundtrip, dateorigin, da
           #(grepl("BEG|TIA|ZRH|OSL|KEF|IST|SVO|LED|ATL|LAX|JFK|DEN|DEW|SFO|YYZ|YVR|MEX|GRU|SCL|LIM|AEP|BOG|SYD|MEL|PER|AKL|TLV|DXB|DEL|BOM|BLR|CCU|PEK|PVG|CAN|CTU|HKG|
           #SIN|ICN|HND|FUK|CGK|JNB|HRG|CMN|LOS|ALG|NBO|TUN|ADD", airp_mat[i,1]) == FALSE)
           refundable = F))) # default: F - refundable AND non-refundable are listed
-}
-}
- else {
-  if (is.null(datedeparture)){
-    warning("Insert a date")}
-  else{
-  x <- NULL
-  for (i in 1:(length(airp_mat[,1]))) 
-  {
-    #if (airp_mat[i,1] != airp_mat[i,2])
-    x[i] <- list(list(
-      request = list(
-        slice = list(
-          #Segment A
-          list(origin = airp_mat[i,1], destination = airp_mat[i,2], date = dateorigin, preferredCabin = 'COACH',
-               permittedDepartureTime = list(earliestTime = earliest1, latestTime = latest1),
-               maxConnectionDuration = connec1),
-          #Segment B
-          list(origin = airp_mat[i,2], destination = airp_mat[i,1], date = datedeparture, preferredCabin = 'COACH',
-               permittedDepartureTime = list(earliestTime = earliest2, latestTime = latest2),
-               maxConnectionDuration = connec2)),
-        passengers = list(adultCount = 1, infantInLapCount = 0, infantInSeatCount = 0, childCount = 0, seniorCount = 0),
-        solutions = 500,
-        maxPrice =  maxprice,
-        #(grepl("BEG|TIA|ZRH|OSL|KEF|IST|SVO|LED|ATL|LAX|JFK|DEN|DEW|SFO|YYZ|YVR|MEX|GRU|SCL|LIM|AEP|BOG|SYD|MEL|PER|AKL|TLV|DXB|DEL|BOM|BLR|CCU|PEK|PVG|CAN|CTU|HKG|
-        #SIN|ICN|HND|FUK|CGK|JNB|HRG|CMN|LOS|ALG|NBO|TUN|ADD", airp_mat[i,1]) == FALSE)
-        refundable = F))) # default: F - refundable AND non-refundable are listed
-  }
-}}
+    }
+  } else {
+    if (is.null(datedeparture)){
+      warning("Insert a date")}
+    else{
+      x <- NULL
+      for (i in 1:(length(airp_mat[,1]))) 
+      {
+        #if (airp_mat[i,1] != airp_mat[i,2])
+        x[i] <- list(list(
+          request = list(
+            slice = list(
+              #Segment A
+              list(origin = airp_mat[i,1], destination = airp_mat[i,2], date = dateorigin, preferredCabin = 'COACH',
+                   permittedDepartureTime = list(earliestTime = earliest1, latestTime = latest1),
+                   maxConnectionDuration = connec1),
+              #Segment B
+              list(origin = airp_mat[i,2], destination = airp_mat[i,1], date = datedeparture, preferredCabin = 'COACH',
+                   permittedDepartureTime = list(earliestTime = earliest2, latestTime = latest2),
+                   maxConnectionDuration = connec2)),
+            passengers = list(adultCount = 1, infantInLapCount = 0, infantInSeatCount = 0, childCount = 0, seniorCount = 0),
+            solutions = 500,
+            maxPrice =  maxprice,
+            refundable = F))) # default: F - refundable AND non-refundable are listed
+      }
+    }}
   headers <- list('Accept' = 'application/json', 'Content-Type' = 'application/json', 'charset' = 'UTF-8')
   datajson <- NULL
-  for (i in 1:(length(airp_mat[,1]))) 
-  {
+  for (i in 1:(length(airp_mat[,1]))) {
     datajson[i] <- postForm(url, .opts=list(postfields=toJSON(x[[i]]), httpheader=headers))
   }#JSON request from the server, it could take several minutes
   
@@ -165,8 +134,22 @@ flight_ticket <- function(Apikey, origin, destination, roundtrip, dateorigin, da
     carrlist[[i]] <- carrier_a
   }
   
-  
-  
+  arrival <- list()
+  for (k in 1:(length(airp_mat[,1]))){
+    arrival_a <- datajson[i] %>%
+      enter_object("trips","tripOption") %>%
+      gather_array %>%
+      spread_values(
+        id = jstring("id")) %>%
+      enter_object("slice") %>% gather_array %>%
+      enter_object("segment") %>% gather_array %>%
+      enter_object("leg") %>% gather_array %>%
+      spread_values(destination = jstring('destination'),
+                    arrival = jstring("arrivalTime"),
+                    departure = jstring('departureTime'))%>%
+      select(id, departure, arrival, destination)
+    arrival[[i]] <- arrival_a
+  }
   #----Data Cleaning----------
   
   #We use lists of objects to apply the loop on all the connections considered
@@ -200,6 +183,8 @@ flight_ticket <- function(Apikey, origin, destination, roundtrip, dateorigin, da
   origin_R <- list()
   destination_A <- list()
   destination_R <- list()
+  arr1 <- list()
+  arr2 <- list()
   for (i in 1:(length(airp_mat[,1]))) 
   {
     if (dim(datalist[[i]])[1] != 0){
@@ -284,58 +269,15 @@ flight_ticket <- function(Apikey, origin, destination, roundtrip, dateorigin, da
       # price
       #It should be implemented with the rest of extra-EU country currencies
       #Exchange rate must be updated
-      temp <- tempfile()
-      download.file("https://www.ecb.europa.eu/stats/eurofxref/eurofxref.zip",temp)
-      exchange <- t(read.csv((unz(temp, "eurofxref.csv"))))
-      currency <- rownames(exchange)
-      currency <- currency[2:32]
-      exchange <- as.numeric(exchange)
-      exchange <- exchange[2:32]
-      exchange <- 1/exchange
-      curr <- paste(currency, collapse='|')
+      
       
       if (length(duSingle[[i]][,1]) != 0) {
         pd[[i]] <- flight_data[[i]][,1:2]
-        pd[[i]]$price <- parse_number(pd[[i]]$saleTotal)
-        pd[[i]]$price1 = matrix(nrow = length(pd[[i]]$price))
-          pd[[i]]$price1[grep(currency[1], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[1]
-          pd[[i]]$price1[grep(currency[2], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[2]
-          pd[[i]]$price1[grep(currency[3], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[3]
-          pd[[i]]$price1[grep(currency[4], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[4]
-          pd[[i]]$price1[grep(currency[5], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[5]
-          pd[[i]]$price1[grep(currency[6], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[6]
-          pd[[i]]$price1[grep(currency[7], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[7]
-          pd[[i]]$price1[grep(currency[8], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[8]
-          pd[[i]]$price1[grep(currency[9], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[9]
-          pd[[i]]$price1[grep(currency[10], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[10]
-          pd[[i]]$price1[grep(currency[11], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[11]
-          pd[[i]]$price1[grep(currency[12], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[12]
-          pd[[i]]$price1[grep(currency[13], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[13]
-          pd[[i]]$price1[grep(currency[14], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[14]
-          pd[[i]]$price1[grep(currency[15], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[15]
-          pd[[i]]$price1[grep(currency[16], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[16]
-          pd[[i]]$price1[grep(currency[17], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[17]
-          pd[[i]]$price1[grep(currency[18], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[18]
-          pd[[i]]$price1[grep(currency[19], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[19]
-          pd[[i]]$price1[grep(currency[20], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[20]
-          pd[[i]]$price1[grep(currency[21], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[21]
-          pd[[i]]$price1[grep(currency[22], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[22]
-          pd[[i]]$price1[grep(currency[23], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[23]
-          pd[[i]]$price1[grep(currency[24], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[24]
-          pd[[i]]$price1[grep(currency[25], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[25]
-          pd[[i]]$price1[grep(currency[26], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[26]
-          pd[[i]]$price1[grep(currency[27], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[27]
-          pd[[i]]$price1[grep(currency[28], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[28]
-          pd[[i]]$price1[grep(currency[29], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[29]
-          pd[[i]]$price1[grep(currency[30], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[30]
-          pd[[i]]$price1[grep(currency[31], pd[[i]]$saleTotal[1]) == TRUE] <- pd[[i]]$price*exchange[31]
-          
-          pd[[i]]$price1[grepl(curr, pd[[i]]$saleTotal[1]) != TRUE] <- pd[[i]]$price
       }
       else {
         pd[[i]] <- data.frame(id=0, saleTotal=0, price =0, price1 = 0)
       }
-      pd1[[i]] <- pd[[i]][,c(1,4)]
+      pd1[[i]] <- pd[[i]][,c(1,2)]
       dataframe[[i]] <- join(dataframe[[i]], pd1[[i]], by='id', type='left', match='first')
       
       
@@ -382,13 +324,15 @@ flight_ticket <- function(Apikey, origin, destination, roundtrip, dateorigin, da
       #dataframe[[i]] <- dataframe[[i]][dataframe[[i]]$id %in% onlyCoachID[[i]],]
       dataframe[[i]] <- as.data.frame(cbind(dataframe[[i]], origin_A[[i]], destination_A[[i]], origin_R[[i]], 
                                             destination_R[[i]]))
-      
+      arr2[[i]] <- as.data.frame(arrival[[i]][arrival[[i]]$destination == airp_mat[i,2],])
+      arr1[[i]] <- as.data.frame(arr2[[i]][,c(1,3)])
       carrier[[i]] <- as.data.frame(carrier[[i]])
       dataframe[[i]] <- join(dataframe[[i]], carrier[[i]], by='id', type='left', match='first')
+      dataframe[[i]] <- join(dataframe[[i]], arr1[[i]], by='id', type='left', match='first')
       
       colnames(dataframe[[i]]) <- c("id", "Duration", "Distance", "Number of Segment", "Direct", "Refundable", "Price",
-                                    "Date", "Origin_A", "Destination_A", "Origin_B", "Destination_B", names_1)
-      }
+                                    "Date", "Origin_A", "Destination_A", "Origin_B", "Destination_B", names_1, "Arrival")
+    }
     else {
       
       dataframe[[i]] <- data.frame(id = "NA", Duration = 0, Distance = 0, Number_of_segment = 0,
@@ -396,22 +340,22 @@ flight_ticket <- function(Apikey, origin, destination, roundtrip, dateorigin, da
                                    Date = as.character(rep(x[[i]]$request$slice[[1]][3], 1)), Origin_A = airp_mat[i,1], Destination_A = airp_mat[i,2], 
                                    Origin_R = airp_mat[i,2], Destination_R = airp_mat[i,1], Carrier_1 = "NA",Carrier_2 = "NA",Carrier_3 = "NA",
                                    Carrier_4 = "NA", Carrier_5 = "NA", Carrier_6 = "NA", Carrier_7 = "NA", Carrier_8 = "NA",
-                                   Carrier_9 = "NA", Carrier_10 = "NA")
+                                   Carrier_9 = "NA", Carrier_10 = "NA", Arrival = "NA")
       colnames(dataframe[[i]]) <- c("id", "Duration", "Distance", "Number of Segment", "Direct", "Refundable", "Price",
-                                    "Date", "Origin_A", "Destination_A", "Origin_B", "Destination_B", names_1)
+                                    "Date", "Origin_A", "Destination_A", "Origin_B", "Destination_B", names_1, 'Arrival')
     }
   }
   
- 
   
-onlycoach <- do.call("rbind", unique(onlyCoachID))
-onlycoach <- c(onlycoach)
-business <- do.call("rbind", unique(businessID))
-business <- c(business)
+  
+  onlycoach <- do.call('rbind.fill', unique(onlyCoachID))
+  onlycoach <- c(onlycoach)
+  business <- do.call('rbind.fill', unique(businessID))
+  business <- c(business)
   
   #Unlist the dataframe list to a db
-
-  db <- do.call("rbind", dataframe)
+  
+  db <- rbindlist(dataframe)
   if (flexible == TRUE){
     db <- db[db$Refundable == TRUE,]
   } else{
@@ -432,14 +376,14 @@ business <- c(business)
     db$city1[db$Origin_A == airport$Code[h]] <- airport$City[h]
     db$city2[db$Destination_A == airport$Code[h]] <- airport$City[h]
   }
-
-db$Economy[db$id %in% onlycoach] <- "Economy"
-db$Economy[!db$id %in% onlycoach] <- "Business"
-
-
-
+  
+  db$Economy[db$id %in% onlycoach] <- "Economy"
+  db$Economy[!db$id %in% onlycoach] <- "Business"
+  
+  
+  
   db$route <- paste(db$Origin_A, db$Origin_B, sep = '-')
-
+  
   
   db
   
