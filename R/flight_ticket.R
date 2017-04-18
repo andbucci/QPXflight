@@ -384,6 +384,9 @@ flight_ticket <- function(Apikey, origin, destination, roundtrip, dateorigin, da
   
   db$route <- paste(db$Origin_A, db$Origin_B, sep = '-')
   
+  db$Currency <- sub("^([[:alpha:]]*).*", "\\1", db$Price)
+  
+  db$Amount <- as.numeric(str_extract(db$Price, "\\d+\\.*\\d*"))
   
   db
   
