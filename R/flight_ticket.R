@@ -32,7 +32,7 @@ flight_ticket <- function(Apikey, origin, destination, roundtrip, dateorigin, da
                  permittedDepartureTime = list(earliestTime = earliest1, latestTime = latest1),
                  maxConnectionDuration = connec1)),
           passengers = list(adultCount = 1, infantInLapCount = 0, infantInSeatCount = 0, childCount = 0, seniorCount = 0),
-          solutions = 500,
+          solutions = 20,
           maxPrice = maxprice,
           #(grepl("BEG|TIA|ZRH|OSL|KEF|IST|SVO|LED|ATL|LAX|JFK|DEN|DEW|SFO|YYZ|YVR|MEX|GRU|SCL|LIM|AEP|BOG|SYD|MEL|PER|AKL|TLV|DXB|DEL|BOM|BLR|CCU|PEK|PVG|CAN|CTU|HKG|
           #SIN|ICN|HND|FUK|CGK|JNB|HRG|CMN|LOS|ALG|NBO|TUN|ADD", airp_mat[i,1]) == FALSE)
@@ -58,7 +58,7 @@ flight_ticket <- function(Apikey, origin, destination, roundtrip, dateorigin, da
                    permittedDepartureTime = list(earliestTime = earliest2, latestTime = latest2),
                    maxConnectionDuration = connec2)),
             passengers = list(adultCount = 1, infantInLapCount = 0, infantInSeatCount = 0, childCount = 0, seniorCount = 0),
-            solutions = 500,
+            solutions = 20,
             maxPrice =  maxprice,
             refundable = F))) # default: F - refundable AND non-refundable are listed
       }
